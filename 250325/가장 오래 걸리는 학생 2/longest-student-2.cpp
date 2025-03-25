@@ -14,6 +14,7 @@ int main(){
         int u, v;
         ll w;
         cin >> u >> v >> w;
+
         adj[u].push_back({v, w});
         adj[v].push_back({u, w});
     }
@@ -22,6 +23,7 @@ int main(){
     dist[N] = 0;
     priority_queue<pair<ll,int>, vector<pair<ll,int>>, greater<pair<ll,int>>> pq;
     pq.push({0, N});
+
     while(!pq.empty()){
         auto [cd, u] = pq.top();
         pq.pop();
