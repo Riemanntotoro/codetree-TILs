@@ -1,69 +1,64 @@
 #include <iostream>
 #include <queue>
+#include <vector>
 #include <algorithm>
-#include <cstring>
+#include <climits>
+
 using namespace std;
 
 int N, A, B;
 char grid[30][30];
-int maxDist = 0;
 int dy[4] = {-1, 1, 0, 0};
 int dx[4] = {0, 0, -1, 1};
 
-int bfs(int sy, int sx){
-    int dist[30][30];
-    memset(dist, -1, sizeof(dist));
-    queue<pair<int, int>> q;
-    q.push({sy, sx});
+int dijkstra(int sy, int sx){
+    vector<vector<int>> dist(N, vector<int>(N, INT_MAX));
+    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<>> pq;
+
     dist[sy][sx] = 0;
+    pq.push({0, {sy, sx}});
 
-    while(!q.empty()){
-        int y = q.front().first;
-        int x = q.front().second;
-        q.pop();
+    while (!pq.empty()){
+        auto [cost, pos] = pq.top(); pq.pop();
+        int y = pos.first, x = pos.second;
 
-        for(int i=0; i<4; i++){
-            int ny = y + dy[i];
-            int nx = x + dx[i];
+        if(dist[y][x] < cost) continue;
 
-            if(ny<0||ny>=N||nx<0||nx>=N) continue;
-            if(dist[ny][nx] != -1) continue;
+        for(int i = 0; i < 4; i++){
+            int ny = y + dy[i], nx = x + dx[i];
+            if(ny < 0 || ny >= N || nx < 0 || nx >= N) continue;
 
-            if(grid[ny][nx] == grid[y][x])
-                dist[ny][nx] = dist[y][x] + A;
-            else
-                dist[ny][nx] = dist[y][x] + B;
+            int ncost = cost + (grid[ny][nx] == grid[y][x] ? A : B);
 
-            q.push({ny, nx});
+            if(dist[ny][nx] > ncost){
+                dist[ny][nx] = ncost;
+                pq.push({ncost, {ny, nx}});
+            }
         }
     }
 
-    int localMax = 0;
-    for(int i=0; i<N; i++){
-        for(int j=0; j<N; j++){
-            if(dist[i][j] > localMax)
-                localMax = dist[i][j];
-        }
-    }
-    return localMax;
+    int maxDist = 0;
+    for(int i = 0; i < N; i++)
+        for(int j = 0; j < N; j++)
+            maxDist = max(maxDist, dist[i][j]);
+
+    return maxDist;
 }
 
 int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    ios::sync_with_stdio(false); cin.tie(nullptr);
 
     cin >> N >> A >> B;
-
-    for(int i=0; i<N; i++)
-        for(int j=0; j<N; j++)
+    for(int i = 0; i < N; i++)
+        for(int j = 0; j < N; j++)
             cin >> grid[i][j];
 
     int answer = 0;
-    for(int i=0; i<N; i++)
-        for(int j=0; j<N; j++)
-            answer = max(answer, bfs(i, j));
 
-    cout << answer - 1 << '\n';
+    for(int i = 0; i < N; i++)
+        for(int j = 0; j < N; j++)
+            answer = max(answer, dijkstra(i, j));
 
+    cout << answer << '\n';
     return 0;
 }
