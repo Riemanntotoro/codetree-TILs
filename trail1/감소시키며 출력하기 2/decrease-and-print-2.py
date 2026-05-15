@@ -1,2 +1,4 @@
-lst = [i for i in range(26, 9, -1)]
-print(*lst)
+i = 26
+while i >= 10:
+    print(i, end=" ")
+    i -= 1
